@@ -12,6 +12,7 @@
     "test": "NODE_ENV=testing npm run start"
   },
   "dependencies": {
+    "@google/maps": "^0.4.5",
     "@mean-expert/boot-script": "^1.0.0",
     "@mean-expert/loopback-component-realtime": "^1.0.0-rc.9.6",
     "@mean-expert/loopback-sdk-builder": "^2.1.0-rc.13.5",

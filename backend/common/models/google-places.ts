@@ -1,36 +1,34 @@
 import { Model } from '@mean-expert/model';
+import * as googleMapsSdk from '@google/maps';
+
 /**
  * @module GooglePlaces
  * @description
- * Write a useful GooglePlaces Model description.
- * Register hooks and remote methods within the
- * Model Decorator
+ * Google Maps SDK
  **/
 @Model({
-  hooks: {
-    beforeSave: { name: 'before save', type: 'operation' }
-  },
-  remotes: {
-    myRemote: {
-      returns : { arg: 'result', type: 'array' },
-      http    : { path: '/my-remote', verb: 'get' }
-    }
-  }
+  hooks: {},
+  remotes: {}
 })
 
 class GooglePlaces {
-  // LoopBack model instance is injected in constructor
-  constructor(public model: any) {}
-
-  // Example Operation Hook
-  beforeSave(ctx: any, next: Function): void {
-    console.log('GooglePlaces: Before Save');
-    next();
-  }
-  // Example Remote Method
-  myRemote(next: Function): void {
-    this.model.find(next);
-  }
+  private _sdk: any;
+  
+    constructor(public model: any) {
+        // create shortcut to sdk, as this.model.app.models.GoogleMaps.sdk()
+        this.model.sdk = () => this._getSingleton();
+    }
+  
+    private _getSingleton = () => {
+        return this._sdk || this._createSdk();
+    }
+  
+    private _createSdk() {
+      return this._sdk = googleMapsSdk.createClient({
+          key: this.model.app.settings.GOOGLE_API_KEY,
+          Promise: Promise
+      });
+    }  
 }
 
 module.exports = GooglePlaces;
