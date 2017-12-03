@@ -39,5 +39,9 @@
   "GooglePlaces": {
     "dataSource": null,
     "public": false
+  },
+  "Spritbolag": {
+    "dataSource": null,
+    "public": true
   }
 }
