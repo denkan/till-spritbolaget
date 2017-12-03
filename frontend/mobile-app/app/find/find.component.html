@@ -1,5 +1,24 @@
 <GridLayout class="page">
 
-    <Label text="Find page..."></Label>
+    <GridLayout *ngIf="!searched" colums="*,auto,*" rows="*,auto,*">
+        <Button col="1" row="1" class="btn btn-primary alert-button" (tap)="onAlertButtonTap($event)"></Button>
+    </GridLayout>
+
+
+    <GridLayout *ngIf="searched" rows="*,auto">
+        <ScrollView #scrollListFFS row="1" orientation="horizontal">
+            <StackLayout orientation="horizontal" class="result-list" [style.padding]="cardStyle.offsetX">
+                <GridLayout class="card" 
+                    *ngFor="let item of myItems; let i=index;" 
+                    [class.selected]="selectedItemIndex===i"
+                    [style.width]="cardStyle.width"
+                    [style.margin]="cardStyle.margin"
+                    (tap)="onItemTap(item,i)"
+                >
+                    <Label [text]="i"></Label>
+                </GridLayout>
+            </StackLayout>
+        </ScrollView>
+    </GridLayout>
 
 </GridLayout>
