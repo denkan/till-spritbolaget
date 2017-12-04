@@ -1,7 +1,12 @@
 <GridLayout class="page">
 
     <GridLayout *ngIf="!searched" colums="*,auto,*" rows="*,auto,*">
-        <Button col="1" row="1" class="btn btn-primary alert-button" (tap)="onAlertButtonTap($event)"></Button>
+        <Button 
+            class="btn btn-primary alert-button" 
+            col="1" row="1" 
+            (tap)="onAlertButtonTap($event)"
+            [shadow]="alertButtonShadow"
+        ></Button>
     </GridLayout>
 
 

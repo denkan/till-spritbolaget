@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
+import { android as isAndroid, ios as isIOS } from 'application';
 import { Page } from "ui/page/page";
 import { ScrollView } from "ui/scroll-view";
+import { AndroidData, IOSData, ShapeEnum } from "nativescript-ng-shadow";
 
 @Component({
     selector: "FindPage",
@@ -10,8 +12,10 @@ import { ScrollView } from "ui/scroll-view";
 })
 export class FindComponent implements OnInit {
     searched = false;
-    myItems = [ {},{},{},{},{} ];
+    myItems = [{}, {}, {}, {}, {}];
     selectedItemIndex = 0;
+
+    alertButtonShadow: AndroidData  |  IOSData;
 
     @ViewChild('scrollListFFS') scrollListRef: ElementRef;
     scrollList: ScrollView;
@@ -27,13 +31,21 @@ export class FindComponent implements OnInit {
     ngOnInit(): void {
         this.page.actionBarHidden = true;
 
+        this.alertButtonShadow = isAndroid ? {
+            elevation: 12,
+            bgcolor: '#D84039',
+            shape: ShapeEnum.OVAL,
+        } : {
+            elevation: 12,
+        }
+
         this.collectUiInfo();
     }
 
-    collectUiInfo(){
+    collectUiInfo() {
         this.pageWidth = this.page.getActualSize().width;
 
-        if(!this.pageWidth){
+        if (!this.pageWidth) {
             setTimeout(() => { this.collectUiInfo() }, 100);
             return false;
         }
