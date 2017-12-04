@@ -63,7 +63,7 @@ export class GeolocationService {
         options = options || {};
 
         return new Promise((resolve, reject) => {
-            geolocation.enableLocationRequest(options.iosAlways)
+            geolocation.enableLocationRequest(true)
                 .then(() => {
                     this._enabled$$.next(true);
                     resolve(true)
