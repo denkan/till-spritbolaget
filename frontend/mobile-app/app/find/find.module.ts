@@ -6,12 +6,14 @@ import { NgShadowModule } from 'nativescript-ng-shadow';
 
 import { routes } from "./find.routes";
 import { FindComponent } from "./find.component";
+import { GeolocationModule } from "../shared/geolocation";
 
 @NgModule({
     imports: [
         NativeScriptCommonModule,
         NativeScriptRouterModule.forChild(routes),
         NgShadowModule,
+        GeolocationModule
     ],
     declarations: [
         FindComponent,

@@ -1,8 +1,12 @@
 import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
 import { android as isAndroid, ios as isIOS } from 'application';
 import { Page } from "ui/page/page";
+import * as dialogs from "ui/dialogs";
 import { ScrollView } from "ui/scroll-view";
 import { AndroidData, IOSData, ShapeEnum } from "nativescript-ng-shadow";
+import { Location } from "nativescript-geolocation";
+
+import { GeolocationService } from "../shared/geolocation";
 
 @Component({
     selector: "FindPage",
@@ -12,6 +16,7 @@ import { AndroidData, IOSData, ShapeEnum } from "nativescript-ng-shadow";
 })
 export class FindComponent implements OnInit {
     searched = false;
+    currLocation: Location;
     myItems = [{}, {}, {}, {}, {}];
     selectedItemIndex = 0;
 
@@ -25,6 +30,7 @@ export class FindComponent implements OnInit {
 
     constructor(
         private page: Page,
+        private geolocation: GeolocationService,
     ) {
     }
 
@@ -40,6 +46,9 @@ export class FindComponent implements OnInit {
         }
 
         this.collectUiInfo();
+
+        this.geolocation.currentLocation$.subscribe(loc => this.currLocation = loc);
+        this.geolocation.getCurrent({ silent: true });
     }
 
     collectUiInfo() {
@@ -59,7 +68,10 @@ export class FindComponent implements OnInit {
     }
 
     onAlertButtonTap() {
-        this.searched = true;
+
+        this.geolocation.getCurrent()
+            .then(data => this.searched = true)
+            .catch(e => dialogs.alert(e.message || e));
     }
 
     onItemTap(item, index) {

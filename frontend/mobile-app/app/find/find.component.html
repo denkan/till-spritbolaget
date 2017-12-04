@@ -11,6 +11,9 @@
 
 
     <GridLayout *ngIf="searched" rows="*,auto">
+        <StackLayout row="0">
+            <Label [text]="currLocation | json" textWrap="true"></Label>
+        </StackLayout>
         <ScrollView #scrollListFFS row="1" orientation="horizontal">
             <StackLayout orientation="horizontal" class="result-list" [style.padding]="cardStyle.offsetX">
                 <GridLayout class="card" 
