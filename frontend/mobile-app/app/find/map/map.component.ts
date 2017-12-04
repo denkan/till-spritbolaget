@@ -61,8 +61,6 @@ export class MapComponent implements OnInit {
         this.geolocation.currentLocation$
             .filter(pos => !!pos)
             .subscribe(pos => {
-                console.log('got pos')
-                console.dir(pos);
                 this.latitude = pos.latitude;
                 this.longitude = pos.longitude;
                 this.zoom = 12;

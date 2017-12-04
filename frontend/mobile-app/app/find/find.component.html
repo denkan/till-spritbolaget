@@ -14,12 +14,12 @@
 
     <GridLayout *ngIf="searched" rows="*,auto">
         <StackLayout row="0">
-            <Label [text]="currLocation | json" textWrap="true"></Label>
+            <Label [text]="foundNearby | json" textWrap="true"></Label>
         </StackLayout>
-        <ScrollView #scrollListFFS row="1" orientation="horizontal">
+        <ScrollView #scrollList row="1" orientation="horizontal">
             <StackLayout orientation="horizontal" class="result-list" [style.padding]="cardStyle.offsetX">
                 <GridLayout class="card" 
-                    *ngFor="let item of myItems; let i=index;" 
+                    *ngFor="let item of foundNearby; let i=index;" 
                     [class.selected]="selectedItemIndex===i"
                     [style.width]="cardStyle.width"
                     [style.margin]="cardStyle.margin"

@@ -6,7 +6,9 @@ import { ScrollView } from "ui/scroll-view";
 import { AndroidData, IOSData, ShapeEnum } from "nativescript-ng-shadow";
 import { Location } from "nativescript-geolocation";
 
+import { FindService } from "./find.service";
 import { GeolocationService } from "../shared/geolocation";
+import { LatLng } from "../shared/models";
 
 @Component({
     selector: "FindPage",
@@ -17,12 +19,12 @@ import { GeolocationService } from "../shared/geolocation";
 export class FindComponent implements OnInit {
     searched = false;
     currLocation: Location;
-    myItems = [{}, {}, {}, {}, {}];
+    foundNearby: any[];
     selectedItemIndex = 0;
 
-    alertButtonShadow: AndroidData  |  IOSData;
+    alertButtonShadow: AndroidData | IOSData;
 
-    @ViewChild('scrollListFFS') scrollListRef: ElementRef;
+    @ViewChild('scrollList') scrollListRef: ElementRef;
     scrollList: ScrollView;
 
     pageWidth: number;
@@ -31,6 +33,7 @@ export class FindComponent implements OnInit {
     constructor(
         private page: Page,
         private geolocation: GeolocationService,
+        private findService: FindService,
     ) {
     }
 
@@ -42,13 +45,25 @@ export class FindComponent implements OnInit {
             bgcolor: '#D84039',
             shape: ShapeEnum.OVAL,
         } : {
-            elevation: 12,
-        }
+                elevation: 12,
+            }
 
         this.collectUiInfo();
 
-        this.geolocation.currentLocation$.subscribe(loc => this.currLocation = loc);
+        this.geolocation.currentLocation$.subscribe(loc => {
+            this.currLocation = loc;
+            this.fetchNearby();
+        });
+        this.findService.foundNearby$.subscribe(results => this.foundNearby = results);
         this.geolocation.getCurrent({ silent: true });
+    }
+
+    fetchNearby() {
+        if (!this.currLocation) return;
+
+        const latlng = LatLng.fromObject(this.currLocation);
+        this.findService.findNearby(latlng)
+            .catch(e => dialogs.alert(e.message || e));
     }
 
     collectUiInfo() {
@@ -71,7 +86,7 @@ export class FindComponent implements OnInit {
 
         this.geolocation.getCurrent()
             .then(data => this.searched = true)
-            .catch(e => dialogs.alert(e.message || e));
+            .catch(e => dialogs.alert(e.message || e));
     }
 
     onItemTap(item, index) {

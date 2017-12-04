@@ -6,9 +6,11 @@ import { NgShadowModule } from 'nativescript-ng-shadow';
 
 import { routes } from "./find.routes";
 import { FindComponent } from "./find.component";
-import { GeolocationModule } from "../shared/geolocation";
+import { FindService } from "./find.service";
 import { MapComponent } from "./map/map.component";
+import { GeolocationModule } from "../shared/geolocation";
 import { GoogleMapsModule } from "../shared/google-maps";
+
 
 @NgModule({
     imports: [
@@ -21,6 +23,9 @@ import { GoogleMapsModule } from "../shared/google-maps";
     declarations: [
         FindComponent,
         MapComponent,
+    ],
+    providers: [
+        FindService,
     ],
     schemas: [
         NO_ERRORS_SCHEMA
