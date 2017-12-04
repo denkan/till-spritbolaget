@@ -1,0 +1,17 @@
+{
+    "README": "Rename this file to config.json",
+
+    "GOOGLE_API_KEY": "",
+
+    "appSettings": {
+        "README": "These will be set to application-settings by app.settings.ts",
+        "DO_YOU_GET_IT": true,
+
+        "ios": {
+            "FYI": "This will only be set on iOS"
+        },
+        "android": {
+            "FYI": "This will only be set on Android"
+        }
+    }
+}

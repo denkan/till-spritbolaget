@@ -1,3 +1,6 @@
 platforms
 app/**/*.js
 app/**/*.css
+
+app/config.json
+app/App_Resources/Android/values/nativescript_google_maps_api.xml

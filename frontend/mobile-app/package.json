@@ -22,6 +22,7 @@
 		"@angular/router": "4.4.6",
 		"nativescript-angular": "4.4.1",
 		"nativescript-geolocation": "^4.2.0",
+		"nativescript-google-maps-sdk": "^2.4.3",
 		"nativescript-ng-shadow": "^1.1.2",
 		"nativescript-theme-core": "1.0.4",
 		"reflect-metadata": "0.1.10",

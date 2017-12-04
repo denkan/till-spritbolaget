@@ -7,16 +7,20 @@ import { NgShadowModule } from 'nativescript-ng-shadow';
 import { routes } from "./find.routes";
 import { FindComponent } from "./find.component";
 import { GeolocationModule } from "../shared/geolocation";
+import { MapComponent } from "./map/map.component";
+import { GoogleMapsModule } from "../shared/google-maps";
 
 @NgModule({
     imports: [
         NativeScriptCommonModule,
         NativeScriptRouterModule.forChild(routes),
         NgShadowModule,
-        GeolocationModule
+        GeolocationModule,
+        GoogleMapsModule,
     ],
     declarations: [
         FindComponent,
+        MapComponent,
     ],
     schemas: [
         NO_ERRORS_SCHEMA

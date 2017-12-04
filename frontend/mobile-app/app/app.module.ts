@@ -5,6 +5,9 @@ import { NSModuleFactoryLoader } from "nativescript-angular/router";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 
+import * as appSettings from './app.settings';
+appSettings.init();
+
 @NgModule({
     bootstrap: [
         AppComponent
