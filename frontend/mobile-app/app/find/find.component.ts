@@ -1,8 +1,6 @@
 import { Component, OnInit } from "@angular/core";
-import { android as isAndroid, ios as isIOS } from 'application';
 import { Page } from "ui/page/page";
 import * as dialogs from "ui/dialogs";
-import { AndroidData, IOSData, ShapeEnum } from "nativescript-ng-shadow";
 import { Location } from "nativescript-geolocation";
 
 import { FindService } from "./find.service";
@@ -20,26 +18,15 @@ export class FindComponent implements OnInit {
     foundNearby: any[];
     selectedItemIndex = 0;
 
-    alertButtonShadow: AndroidData | IOSData;
-
-
     constructor(
         private page: Page,
         private geolocation: GeolocationService,
         private findService: FindService,
-    ) {
-    }
+    ) { }
 
     ngOnInit(): void {
         this.page.actionBarHidden = true;
 
-        this.alertButtonShadow = isAndroid ? {
-            elevation: 12,
-            bgcolor: '#D84039',
-            shape: ShapeEnum.OVAL,
-        } : {
-                elevation: 12,
-            }
 
         this.geolocation.currentLocation$.subscribe(loc => {
             this.currLocation = loc;

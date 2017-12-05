@@ -7,6 +7,7 @@ import { NgShadowModule } from 'nativescript-ng-shadow';
 import { routes } from "./find.routes";
 import { FindComponent } from "./find.component";
 import { FindService } from "./find.service";
+import { AlertButtonComponent } from "./alert-button/alert-button.component";
 import { MapComponent } from "./map/map.component";
 import { CardComponent } from "./card/card.component";
 import { CardListComponent } from "./card-list/card-list.component";
@@ -24,6 +25,7 @@ import { GeolocationModule, GoogleMapsModule, UIModule } from "../shared";
     ],
     declarations: [
         FindComponent,
+        AlertButtonComponent,
         MapComponent,
         CardComponent,
         CardListComponent,

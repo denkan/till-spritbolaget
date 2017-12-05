@@ -2,15 +2,9 @@
 
     <TheMap></TheMap>
 
-    <GridLayout *ngIf="!searched" colums="*,auto,*" rows="*,auto,*">
-        <Button 
-            class="btn btn-primary alert-button" 
-            col="1" row="1" 
-            (tap)="onAlertButtonTap($event)"
-            [shadow]="alertButtonShadow"
-        ></Button>
-    </GridLayout>
-
+    <TheAlertButton *ngIf="!searched"
+        (tap)="onAlertButtonTap($event)"
+    ></TheAlertButton>
 
     <GridLayout *ngIf="searched" rows="*,auto">
         <StackLayout row="0">
