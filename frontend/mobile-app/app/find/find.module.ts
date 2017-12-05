@@ -8,8 +8,7 @@ import { routes } from "./find.routes";
 import { FindComponent } from "./find.component";
 import { FindService } from "./find.service";
 import { MapComponent } from "./map/map.component";
-import { GeolocationModule } from "../shared/geolocation";
-import { GoogleMapsModule } from "../shared/google-maps";
+import { GeolocationModule, GoogleMapsModule, UIModule } from "../shared";
 
 
 @NgModule({
@@ -19,6 +18,7 @@ import { GoogleMapsModule } from "../shared/google-maps";
         NgShadowModule,
         GeolocationModule,
         GoogleMapsModule,
+        UIModule,
     ],
     declarations: [
         FindComponent,

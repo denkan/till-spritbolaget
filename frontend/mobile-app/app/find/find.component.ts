@@ -7,8 +7,7 @@ import { AndroidData, IOSData, ShapeEnum } from "nativescript-ng-shadow";
 import { Location } from "nativescript-geolocation";
 
 import { FindService } from "./find.service";
-import { GeolocationService } from "../shared/geolocation";
-import { LatLng } from "../shared/models";
+import { GeolocationService, LatLng, Size, UIService } from "../shared";
 
 @Component({
     selector: "FindPage",
@@ -27,11 +26,12 @@ export class FindComponent implements OnInit {
     @ViewChild('scrollList') scrollListRef: ElementRef;
     scrollList: ScrollView;
 
-    pageWidth: number;
+    pageSize: Size;
     cardStyle: { width: number, margin: number, offsetX: number };
 
     constructor(
         private page: Page,
+        private ui: UIService,
         private geolocation: GeolocationService,
         private findService: FindService,
     ) {
@@ -48,14 +48,14 @@ export class FindComponent implements OnInit {
                 elevation: 12,
             }
 
-        this.collectUiInfo();
-
         this.geolocation.currentLocation$.subscribe(loc => {
             this.currLocation = loc;
             this.fetchNearby();
         });
         this.findService.foundNearby$.subscribe(results => this.foundNearby = results);
         this.geolocation.getCurrent({ silent: true });
+
+        this.ui.pageSize$.subscribe(size => this.setCardSize(size));
     }
 
     fetchNearby() {
@@ -66,18 +66,15 @@ export class FindComponent implements OnInit {
             .catch(e => dialogs.alert(e.message || e));
     }
 
-    collectUiInfo() {
-        this.pageWidth = this.page.getActualSize().width;
+    setCardSize(pageSize: Size) {
+        if(!pageSize || !pageSize.width) return;
 
-        if (!this.pageWidth) {
-            setTimeout(() => { this.collectUiInfo() }, 100);
-            return false;
-        }
+        this.pageSize = pageSize;
 
         this.cardStyle = {
-            width: this.pageWidth * 0.6, // 80%
+            width: this.pageSize.width * 0.6, // 80%
             margin: 10, //this.pageWidth * 0.1, // 10%
-            offsetX: this.pageWidth * 0.2 - 10,
+            offsetX: this.pageSize.width * 0.2 - 10,
         }
         return true;
     }
