@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/toPromise';
 
-import { GoogleMapsService } from '../shared/google-maps';
+import { GoogleMapsService, LatLng, Utils } from '../shared';
 import { Location } from 'nativescript-geolocation';
-
-import { LatLng } from '../shared/models';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Injectable()
 export class FindService {
@@ -42,14 +40,25 @@ export class FindService {
 
             this.googleMaps.fetch('place/nearbysearch', searchOptions)
                 .toPromise()
-                .then(_filterAndCacheData)
+                .then(_finalizeData)
                 .catch(reject);
 
             const that = this;
-            function _filterAndCacheData(googleData: any) {
+            function _finalizeData(googleData: any) {
                 let results = (googleData || {}).results || [];
                 // systembolaget only:
                 results = results.filter(r => r.name === searchName);
+
+                results = results.map(r => {
+                    // calc distance
+                    const pos = LatLng.fromObject(r.geometry.location);
+                    r.distance = Math.round(Utils.getDistance(location, pos));
+                    // parse street + city
+                    const address = (', '+r.vicinity).split(', ');
+                    r.city = address.pop();
+                    r.street = address.slice(1);
+                    return r;
+                });
 
                 that._foundNearby$$.next(results);
                 resolve(results);

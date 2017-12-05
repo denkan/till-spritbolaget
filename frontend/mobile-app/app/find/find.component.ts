@@ -27,14 +27,12 @@ export class FindComponent implements OnInit {
     ngOnInit(): void {
         this.page.actionBarHidden = true;
 
-
         this.geolocation.currentLocation$.subscribe(loc => {
             this.currLocation = loc;
             this.fetchNearby();
         });
         this.findService.foundNearby$.subscribe(results => this.foundNearby = results);
         this.geolocation.getCurrent({ silent: true });
-
     }
 
     fetchNearby() {

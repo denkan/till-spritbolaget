@@ -1,8 +1,22 @@
-<GridLayout class="card" 
+<GridLayout class="card" rows="auto,auto" columns="*,auto"
     [style.width]="style.width"
     [style.margin]="style.margin"
     [class.selected]="selected"
     (tap)="onSelect()"
 >
-    <Label [text]="item.vicinity"></Label>
+    <Label row="0" [text]="item.city" class="h2 m-t-10"></Label>
+    <Label row="1" [text]="item.street" class="body m-b-10"></Label>
+
+    <GridLayout rowSpan="2" col="1" class="status" [class.is-open]="item.opening_hours.open_now">
+        <StackLayout row="1">
+            <Label text="ÖPPET" class="h3 open"></Label>
+            <Label text="STÄNGT" class="h3 closed"></Label>
+            <Label>
+                <FormattedString>
+                    <Span [text]="(item.distance/1000) | number:'1.1-1'" class="h2"></Span>
+                    <Span text=" km" class="h4"></Span>
+                </FormattedString>
+            </Label>
+        </StackLayout>
+    </GridLayout>
 </GridLayout>

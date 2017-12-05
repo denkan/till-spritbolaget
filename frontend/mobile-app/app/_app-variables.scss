@@ -46,7 +46,8 @@ $primary: lighten(#000, 13%);
 $secondary: lighten(#000, 46%);
 $disabled: lighten(#000, 62%);
 $accent: $accent-dark;
-$error: $error-light;
+$success: $success-dark;
+$error: $error-dark;
 
 // SideDrawer
 $item-color-android : #737373;

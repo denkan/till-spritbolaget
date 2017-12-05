@@ -1,9 +1,11 @@
+@import "../../app-variables";
+
 .card {
     //width: 300;
-    height: 100;
+    //height: 100;
     background-color: white;
     border-radius: 3;
-    padding: 10 20;
+    padding: 0 0 0 20;
     //margin: 5;
     color: black;
     opacity: 0.75;
@@ -12,5 +14,25 @@
     &.selected {
         opacity: 1;
         transform: scale(1.1);
+    }
+
+    .status {
+        border-color: #CCC;
+        border-width: 0 0 0 1;
+        padding: 10 10 0 10;
+        margin-left: 10;
+        background-color: $success;
+        border-radius: 0 3 3 0;
+
+        * { color: white; horizontal-align: center; }
+
+        .open { visibility: collapse; }
+        .closed { visibility: visible; }
+
+        &.is-open {
+            background-color: $success;
+            .open { visibility: visible; }
+            .closed { visibility: collapse; }
+        }
     }
 }
