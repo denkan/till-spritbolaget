@@ -1,0 +1,11 @@
+<ScrollView #scrollList row="1" orientation="horizontal">
+    <StackLayout orientation="horizontal" [style.padding]="cardStyle.offsetX">
+        <TheCard 
+            *ngFor="let item of items; let i=index;" 
+            [item]="item"
+            [selected]="i===selectedItemIndex"
+            [style]="cardStyle"
+            (select)="onSelect(item)"
+        ></TheCard>
+    </StackLayout>
+</ScrollView>

@@ -1,0 +1,16 @@
+.card {
+    //width: 300;
+    height: 100;
+    background-color: white;
+    border-radius: 3;
+    padding: 10 20;
+    //margin: 5;
+    color: black;
+    opacity: 0.75;
+    transition: 0.5s;
+
+    &.selected {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+}
