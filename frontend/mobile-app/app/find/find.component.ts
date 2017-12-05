@@ -15,8 +15,8 @@ import { GeolocationService, LatLng, Size, UIService } from "../shared";
 export class FindComponent implements OnInit {
     searched = false;
     currLocation: Location;
-    foundNearby: any[];
-    selectedItemIndex = 0;
+    items: any[];
+    selectedIndex = null;
 
     constructor(
         private page: Page,
@@ -31,8 +31,12 @@ export class FindComponent implements OnInit {
             this.currLocation = loc;
             this.fetchNearby();
         });
-        this.findService.foundNearby$.subscribe(results => this.foundNearby = results);
         this.geolocation.getCurrent({ silent: true });
+        this.findService.selectedIndex$.subscribe(index => this.selectedIndex = index);
+        this.findService.items$.subscribe(items => {
+            this.items = items;
+            this.findService.setSelectedIndex(0);
+        });
     }
 
     fetchNearby() {
@@ -50,6 +54,7 @@ export class FindComponent implements OnInit {
     }
 
     onSelect(item) {
-        this.selectedItemIndex = this.foundNearby.findIndex(r => r.id===item.id);
+        const index = this.items.findIndex(r => r.id===item.id);
+        this.findService.setSelectedIndex(this.selectedIndex);
     }
 }

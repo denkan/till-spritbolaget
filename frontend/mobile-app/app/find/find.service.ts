@@ -7,11 +7,22 @@ import { Location } from 'nativescript-geolocation';
 
 @Injectable()
 export class FindService {
-    private _foundNearby$$: BehaviorSubject<any[]> = new BehaviorSubject(null);
+    private _items$$ = new BehaviorSubject<any[]>([]);
+    private _selectedIndex$$ = new BehaviorSubject<number>(null);
 
-    get foundNearby$() {
-        return this._foundNearby$$.asObservable();
+    get items$() {
+        return this._items$$.asObservable();
     }
+    get selectedIndex$() {
+        return this._selectedIndex$$.asObservable();
+    }
+    get selectedItem$() {
+        return this.selectedIndex$.map(i => {
+            const items = this._items$$.value;
+            return items.length ? items[i] : null;
+        });
+    }  
+    
 
     constructor(
         private googleMaps: GoogleMapsService,
@@ -60,11 +71,24 @@ export class FindService {
                     return r;
                 });
 
-                that._foundNearby$$.next(results);
+                that._items$$.next(results);
                 resolve(results);
             }
 
         });
+    }
+
+    /**
+     * Set selected item index
+     * @param index 
+     */
+    setSelectedIndex(index: number) {
+        const items = this._items$$.value;
+        if(index < items.length){
+            return false;
+        }
+        this._selectedIndex$$.next(index);
+        return true;
     }
 
 }

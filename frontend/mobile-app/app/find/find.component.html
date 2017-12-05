@@ -6,12 +6,12 @@
         (tap)="onAlertButtonTap($event)"
     ></TheAlertButton>
 
-    <GridLayout *ngIf="searched" rows="*,auto">
+    <GridLayout *ngIf="items.length" rows="*,auto">
         <StackLayout row="0">
-            <Label [text]="foundNearby | json" textWrap="true"></Label>
+            <!--Label [text]="foundNearby | json" textWrap="true"></Label-->
         </StackLayout>
         <TheCardList row="1"
-            [items]="foundNearby"
+            [items]="items"
             (select)="onSelect($event)"
         ></TheCardList>
     </GridLayout>

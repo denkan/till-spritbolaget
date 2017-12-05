@@ -19,10 +19,10 @@ export class GoogleMapsService {
 
     fetch(apiPath: string, params: { [key: string]: any }) {
         const apiUrl = this._apiUrl(apiPath, params);
-        console.log('fetching...', apiUrl)
+        console.log('[GoogleMaps] Fetching...', apiUrl)
         return this.http.get(apiUrl)
             .map(r => r.json())
-            .do(r => console.log('gmaps data', r.results.length))
+            .do(r => console.log('[GoogleMaps] Fetched:', r.results.length))
     }
 
     private _apiUrl(apiPath: string, params: { [key: string]: any }) {
