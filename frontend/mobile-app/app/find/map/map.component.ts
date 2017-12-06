@@ -48,7 +48,7 @@ export class MapComponent implements OnInit, OnChanges {
     zoom = 6;
     bearing = 0;
     tilt = 0;
-    padding = [300, 600, 300, 300];
+    padding = [300, 600, 200, 200];
     mapView: MapView;
     lastCamera: String;
 
@@ -165,7 +165,11 @@ export class MapComponent implements OnInit, OnChanges {
         this.zoom = zoom || 12;
     }
 
-    zoomMapToViewport(pos1: LatLng, pos2: LatLng, padding?: number) {
+    zoomMapToViewport(location1: LatLng, location2: LatLng, padding?: number) {
+        // clone to make sure to not alter original object
+        const pos1 = Object.assign({}, location1);
+        const pos2 = Object.assign({}, location2);
+
         if(pos1.latitude > pos2.latitude){
             const tmp = pos2.latitude;
             pos2.latitude = pos1.latitude;
