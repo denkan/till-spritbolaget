@@ -66,13 +66,19 @@ export class CardListComponent implements OnInit {
                 closestCardRate = ((x + cardWidth / 2) / scrollWidth) * cardCount,
                 closestCardIndex = Math.floor(closestCardRate);
 
-            this.scrollToCard(closestCardIndex);
+            this.scrollToCard(closestCardIndex, 300);
 
         }, 50);
     }
 
-    scrollToCard(index: number) {
+    scrollToCard(index: number, selectDelay?: number) {
         const cardWidth = this.cardStyle.width + (this.cardStyle.margin * 2);
         this.scrollList.scrollToHorizontalOffset((index * cardWidth), true);
+
+        if (selectDelay !== undefined && this.selectedItemIndex !== index) {
+            this.scrollTimer = setTimeout(() => {
+                this.onSelect(this.items[index]);
+            }, selectDelay);            
+        }
     }
 }
