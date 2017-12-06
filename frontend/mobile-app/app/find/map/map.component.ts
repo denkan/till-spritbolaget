@@ -41,6 +41,7 @@ export class MapComponent implements OnInit, OnChanges {
 
     @ViewChild('container') container: ElementRef;
 
+    // map props
     latitude =  60;
     longitude = 15;
     zoom = 6;
@@ -48,7 +49,6 @@ export class MapComponent implements OnInit, OnChanges {
     tilt = 0;
     padding = [40, 40, 40, 40];
     mapView: MapView;
-
     lastCamera: String;
 
 
