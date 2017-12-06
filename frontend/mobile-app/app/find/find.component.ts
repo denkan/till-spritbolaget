@@ -15,7 +15,7 @@ import { GeolocationService, LatLng, Size, UIService } from "../shared";
 export class FindComponent implements OnInit {
     searched = false;
     currLocation: Location;
-    items: any[];
+    items: any[] = [];
     selectedIndex = null;
 
     constructor(

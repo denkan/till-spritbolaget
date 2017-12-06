@@ -1,6 +1,11 @@
 import { LatLng } from "./models";
 
-
+export const COLORS = {
+    SUCCESS: '#06CE6A',
+    ERROR: '#D84039',
+    WARNING: '#F2C112',
+    INFO: '#4781FE',
+}
 
 export function getDistance(p1: LatLng, p2: LatLng) {
     var R = 6378137; // Earth’s mean radius in meter

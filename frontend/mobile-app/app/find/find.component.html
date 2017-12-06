@@ -1,6 +1,9 @@
 <GridLayout class="page">
 
-    <TheMap></TheMap>
+    <TheMap
+        [items]="items"
+        [myLocation]="currLocation"
+    ></TheMap>
 
     <TheAlertButton *ngIf="!searched"
         (tap)="onAlertButtonTap($event)"
