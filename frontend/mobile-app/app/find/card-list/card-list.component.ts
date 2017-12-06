@@ -94,7 +94,7 @@ export class CardListComponent implements OnInit, OnChanges {
     }
 
     scrollToCard(index?: number, selectDelay?: number) {
-        index = index || this.selectedIndex;
+        if(index === undefined) index = this.selectedIndex;
 
         const cardWidth = this.cardStyle.width + (this.cardStyle.margin * 2);
         this.scrollList.scrollToHorizontalOffset((index * cardWidth), true);
