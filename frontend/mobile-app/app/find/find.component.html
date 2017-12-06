@@ -4,6 +4,7 @@
         [myLocation]="currLocation"
         [items]="items"
         [selectedIndex]="selectedIndex"
+        (selectItem)="onSelect($event)"
     ></TheMap>
 
     <TheAlertButton *ngIf="!searched"

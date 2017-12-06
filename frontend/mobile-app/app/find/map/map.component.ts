@@ -1,12 +1,15 @@
-import { Component, OnInit, ElementRef, ViewChild, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { 
+    Component, OnInit, ElementRef, ViewChild, Input, Output, 
+    EventEmitter, OnChanges, SimpleChanges 
+} from '@angular/core';
 import { registerElement } from 'nativescript-angular/element-registry';
-import { MapView, Marker, Position, Style, Bounds } from 'nativescript-google-maps-sdk';
+import { MapView, Marker, Position, Style, Bounds, MarkerEventData } from 'nativescript-google-maps-sdk';
 import { Image } from 'ui/image';
 import { GridLayout } from 'ui/layouts/grid-layout';
 
 import * as mapStyles from './map.styles';
-import { GeolocationService, LatLng, Utils } from '../../shared';
-import { FindService } from '../find.service';
+import { LatLng, Utils } from '../../shared';
+import {  } from '@angular/core/src/event_emitter';
 
 // Important - must register MapView plugin in order to use in Angular templates
 registerElement('MapView', () => MapView);
@@ -22,6 +25,7 @@ export const enum MARKER_TYPES { ME, STORE };
             <MapView row="1" #mapView [latitude]="latitude" [longitude]="longitude"
                 [zoom]="zoom" [bearing]="bearing" [padding]="padding"
                 [tilt]="tilt" (mapReady)="onMapReady($event)"
+
                 compassEnabled="false"
                 indoorLevelPickerEnabled="false"
                 mapToolbarEnabled="false"
@@ -31,6 +35,8 @@ export const enum MARKER_TYPES { ME, STORE };
                 tiltGesturesEnabled="false"
                 zoomControlsEnabled="false"
                 zoomGesturesEnabled="true"
+
+                (markerSelect)="onMarkerSelect($event)"
             ></MapView>
         </GridLayout>
     `,
@@ -39,6 +45,8 @@ export class MapComponent implements OnInit, OnChanges {
     @Input() myLocation: LatLng;
     @Input() items: any[];
     @Input() selectedIndex: number;
+
+    @Output() selectItem = new EventEmitter()
 
     @ViewChild('container') container: ElementRef;
 
@@ -53,11 +61,7 @@ export class MapComponent implements OnInit, OnChanges {
     lastCamera: String;
 
 
-    constructor(
-        private geolocation: GeolocationService,
-        private findService: FindService,
-    ) {
-    }
+    constructor() { }
 
     ngOnInit() {
 
@@ -94,6 +98,14 @@ export class MapComponent implements OnInit, OnChanges {
         this.doChangeTasks();
     }
 
+    onMarkerSelect(e: MarkerEventData) {
+        const data = e.marker.userData;
+        console.log('map.comp.onMarkerSelect: ', Object.keys(data).join(' | '));
+        if (data.type === MARKER_TYPES.STORE) {
+            this.selectItem.emit(data.item);
+        }
+    }
+
     addMyLocationMarker(pos?: LatLng) {
         pos = pos || this.myLocation;
 
@@ -114,6 +126,7 @@ export class MapComponent implements OnInit, OnChanges {
         img.height = 20;
         //img.stretch = 'none';
         //marker.icon = img;
+        marker.flat = true;
         marker.color = Utils.COLORS.WARNING;
 
         this.mapView.addMarker(marker);
@@ -130,13 +143,18 @@ export class MapComponent implements OnInit, OnChanges {
             if (oldMarker) this.mapView.removeMarker(oldMarker);
         }
 
-        items.forEach(item => {
+        items.forEach((item, index) => {
             const pos = LatLng.fromObject(item.geometry.location);
             const marker = new Marker();
             marker.position = Position.positionFromLatLng(pos.latitude, pos.longitude);
             marker.title = (Math.round(item.distance / 100) / 10) + ' km';
             marker.snippet = item.vicinity;
-            marker.userData = { type: MARKER_TYPES.STORE };
+            marker.userData = {
+                type: MARKER_TYPES.STORE,
+                item: item,
+                index: index,
+            };
+            marker.flat = true;
             marker.color = item.opening_hours.open_now ? Utils.COLORS.SUCCESS : Utils.COLORS.ERROR;
             this.mapView.addMarker(marker);
         });
@@ -146,15 +164,15 @@ export class MapComponent implements OnInit, OnChanges {
 
 
 
-    zoomMap() {
-        if(this.selectedIndex !== undefined) {
+    zoomMap() {console.log('zoomMap');
+        if (this.selectedIndex !== undefined) {
             const item = this.items[this.selectedIndex];
             const itemLocation = LatLng.fromObject(item.geometry.location);
             this.zoomMapToViewport(itemLocation, this.myLocation);
             return;
         }
 
-        if(this.myLocation) {
+        if (this.myLocation) {
             this.zoomMapToSingle(this.myLocation);
         }
     }
@@ -162,7 +180,7 @@ export class MapComponent implements OnInit, OnChanges {
     zoomMapToSingle(pos: LatLng, zoom?: number) {
         this.latitude = pos.latitude;
         this.longitude = pos.longitude;
-        this.zoom = zoom || 12;
+        this.zoom = zoom || 12;
     }
 
     zoomMapToViewport(location1: LatLng, location2: LatLng, padding?: number) {
@@ -170,17 +188,17 @@ export class MapComponent implements OnInit, OnChanges {
         const pos1 = Object.assign({}, location1);
         const pos2 = Object.assign({}, location2);
 
-        if(pos1.latitude > pos2.latitude){
+        if (pos1.latitude > pos2.latitude) {
             const tmp = pos2.latitude;
             pos2.latitude = pos1.latitude;
             pos1.latitude = tmp;
         }
-        if(pos1.longitude > pos2.longitude){
+        if (pos1.longitude > pos2.longitude) {
             const tmp = pos2.longitude;
             pos2.longitude = pos1.longitude;
             pos1.longitude = tmp;
         }
-        
+
 
         const bounds = Bounds.fromCoordinates(
             Position.positionFromLatLng(pos1.latitude, pos1.longitude),
