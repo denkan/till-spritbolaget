@@ -1,4 +1,7 @@
-import { Component, OnInit, Input, Output, ViewChild, ElementRef, EventEmitter } from '@angular/core';
+import {
+    Component, OnInit, Input, Output, ViewChild,
+    ElementRef, EventEmitter, OnChanges, SimpleChanges
+} from '@angular/core';
 import { ScrollView, ScrollEventData } from "ui/scroll-view";
 import { Size, UIService } from "../../shared";
 
@@ -8,9 +11,9 @@ import { Size, UIService } from "../../shared";
     templateUrl: './card-list.component.html',
     styleUrls: ['./card-list.component.css']
 })
-export class CardListComponent implements OnInit {
+export class CardListComponent implements OnInit, OnChanges {
     @Input() items: any[];
-    selectedItemIndex = 0;
+    @Input() selectedIndex: number;
 
     @Output() select = new EventEmitter();
 
@@ -33,6 +36,24 @@ export class CardListComponent implements OnInit {
         this.ui.pageSize$.subscribe(size => this.setCardStyle(size));
     }
 
+    private changeTasks: Function[] = [];
+    doChangeTasks() {
+        while (this.changeTasks.length) {
+            this.changeTasks.shift().apply(this);
+        }
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        //console.log('card-list.comp.changes:', Object.keys(changes).join(' | '));
+
+        if (changes.selectedIndex !== undefined) {
+            this.changeTasks.push(this.scrollToCard);
+        }
+
+        // run immediately if cardStyle's set - or wait and run in setCardStyle()
+        if (this.cardStyle) this.doChangeTasks();
+    }
+
     setCardStyle(pageSize: Size) {
         if (!pageSize || !pageSize.width) return;
 
@@ -43,11 +64,12 @@ export class CardListComponent implements OnInit {
             margin: 10, //old: this.pageWidth * 0.1,
             offsetX: Math.floor(this.pageSize.width * 0.2 - 10),
         }
+
+        this.doChangeTasks();
         return true;
     }
 
     onSelect(item) {
-        this.selectedItemIndex = this.items.findIndex(r => r.id === item.id);
         this.select.emit(item);
     }
 
@@ -71,14 +93,16 @@ export class CardListComponent implements OnInit {
         }, 50);
     }
 
-    scrollToCard(index: number, selectDelay?: number) {
+    scrollToCard(index?: number, selectDelay?: number) {
+        index = index || this.selectedIndex;
+
         const cardWidth = this.cardStyle.width + (this.cardStyle.margin * 2);
         this.scrollList.scrollToHorizontalOffset((index * cardWidth), true);
 
-        if (selectDelay !== undefined && this.selectedItemIndex !== index) {
+        if (selectDelay !== undefined && this.selectedIndex !== index) {
             this.scrollTimer = setTimeout(() => {
                 this.onSelect(this.items[index]);
-            }, selectDelay);            
+            }, selectDelay);
         }
     }
 }

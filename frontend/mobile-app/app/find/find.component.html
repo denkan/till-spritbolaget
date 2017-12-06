@@ -11,11 +11,12 @@
     ></TheAlertButton>
 
     <GridLayout *ngIf="items.length" rows="*,auto">
-        <StackLayout row="0">
-            <!--Label [text]="foundNearby | json" textWrap="true"></Label-->
-        </StackLayout>
+        <!--StackLayout row="0">
+            <Label [text]="items | json" textWrap="true"></Label>
+        </StackLayout-->
         <TheCardList row="1"
             [items]="items"
+            [selectedIndex]="selectedIndex"
             (select)="onSelect($event)"
         ></TheCardList>
     </GridLayout>

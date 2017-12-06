@@ -3,7 +3,7 @@
         <TheCard 
             *ngFor="let item of items; let i=index;" 
             [item]="item"
-            [selected]="i===selectedItemIndex"
+            [selected]="i===selectedIndex"
             [style]="cardStyle"
             (select)="onSelect(item)"
         ></TheCard>

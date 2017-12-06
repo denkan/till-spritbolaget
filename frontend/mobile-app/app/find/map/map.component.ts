@@ -79,7 +79,7 @@ export class MapComponent implements OnInit, OnChanges {
         if (changes.items) {
             this.changeTasks.push(this.addStoreMarkers);
         }
-        if (changes.selectedIndex && this.changeTasks.length === 0) {
+        if (changes.selectedIndex !== undefined && this.changeTasks.length === 0) {
             this.changeTasks.push(this.zoomMap);
         }
 
