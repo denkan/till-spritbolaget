@@ -83,10 +83,8 @@ export class FindService {
      * @param index 
      */
     setSelectedIndex(index: number) {
-        const items = this._items$$.value;
-        if(index < items.length){
-            return false;
-        }
+        if(!this._items$$.value[index]) return false;
+        
         this._selectedIndex$$.next(index);
         return true;
     }

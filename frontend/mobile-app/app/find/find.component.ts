@@ -55,6 +55,6 @@ export class FindComponent implements OnInit {
 
     onSelect(item) {
         const index = this.items.findIndex(r => r.id===item.id);
-        this.findService.setSelectedIndex(this.selectedIndex);
+        this.findService.setSelectedIndex(index);
     }
 }

@@ -1,8 +1,9 @@
 <GridLayout class="page">
 
     <TheMap
-        [items]="items"
         [myLocation]="currLocation"
+        [items]="items"
+        [selectedIndex]="selectedIndex"
     ></TheMap>
 
     <TheAlertButton *ngIf="!searched"
