@@ -1,4 +1,4 @@
-<ScrollView #scrollList row="1" orientation="horizontal">
+<ScrollView #scrollList row="1" orientation="horizontal" (scroll)="onScroll($event)">
     <StackLayout orientation="horizontal" [style.padding]="cardStyle.offsetX">
         <TheCard 
             *ngFor="let item of items; let i=index;" 
