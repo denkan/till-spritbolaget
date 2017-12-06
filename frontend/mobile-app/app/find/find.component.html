@@ -4,7 +4,7 @@
         [myLocation]="currLocation"
         [items]="items"
         [selectedIndex]="selectedIndex"
-        (selectItem)="onSelect($event)"
+        (selectItem)="onSelectItem($event)"
     ></TheMap>
 
     <TheAlertButton *ngIf="!searched"
@@ -18,7 +18,7 @@
         <TheCardList row="1"
             [items]="items"
             [selectedIndex]="selectedIndex"
-            (select)="onSelect($event)"
+            (selectItem)="onSelectItem($event)"
         ></TheCardList>
     </GridLayout>
 

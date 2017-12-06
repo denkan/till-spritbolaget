@@ -53,7 +53,7 @@ export class FindComponent implements OnInit {
             .catch(e => dialogs.alert(e.message || e));
     }
 
-    onSelect(item) {
+    onSelectItem(item) {
         const index = this.items.findIndex(r => r.id===item.id);
         this.findService.setSelectedIndex(index);
     }

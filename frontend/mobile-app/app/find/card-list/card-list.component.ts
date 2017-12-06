@@ -15,7 +15,7 @@ export class CardListComponent implements OnInit, OnChanges {
     @Input() items: any[];
     @Input() selectedIndex: number;
 
-    @Output() select = new EventEmitter();
+    @Output() selectItem = new EventEmitter();
 
     @ViewChild('scrollList') scrollListRef: ElementRef;
     scrollList: ScrollView;
@@ -70,7 +70,7 @@ export class CardListComponent implements OnInit, OnChanges {
     }
 
     onSelect(item) {
-        this.select.emit(item);
+        this.selectItem.emit(item);
     }
 
     private scrollTimer: number = null;
