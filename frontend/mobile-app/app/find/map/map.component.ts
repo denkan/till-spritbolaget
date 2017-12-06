@@ -100,7 +100,6 @@ export class MapComponent implements OnInit, OnChanges {
 
     onMarkerSelect(e: MarkerEventData) {
         const data = e.marker.userData;
-        console.log('map.comp.onMarkerSelect: ', Object.keys(data).join(' | '));
         if (data.type === MARKER_TYPES.STORE) {
             this.selectItem.emit(data.item);
         }
@@ -164,7 +163,7 @@ export class MapComponent implements OnInit, OnChanges {
 
 
 
-    zoomMap() {console.log('zoomMap');
+    zoomMap() {
         if (this.selectedIndex !== undefined) {
             const item = this.items[this.selectedIndex];
             const itemLocation = LatLng.fromObject(item.geometry.location);
