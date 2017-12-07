@@ -96,7 +96,6 @@ export class FindService {
     findAndMergeDetails(itemOrIndex: number | any) {
         const item = (typeof itemOrIndex === 'number') ? this._items$$.value[itemOrIndex] : itemOrIndex;
         item.details_loading = true;
-        console.log('findAndMergeDetails 1', item.place_id)
 
         return new Promise((resolve, reject) => {
             this.googleMaps.fetch('place/details', { place_id: item.place_id })
@@ -104,7 +103,6 @@ export class FindService {
                 .toPromise()
                 .catch(reject)
                 .then(details => {
-                    console.log('findAndMergeDetails 2')
                     // merge data
                     item.opening_hours = details.opening_hours;
                     item.address_components = details.address_components;
