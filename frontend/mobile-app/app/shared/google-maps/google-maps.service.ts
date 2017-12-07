@@ -22,7 +22,7 @@ export class GoogleMapsService {
         console.log('[GoogleMaps] Fetching...', apiUrl)
         return this.http.get(apiUrl)
             .map(r => r.json())
-            .do(r => console.log('[GoogleMaps] Fetched:', r.results.length))
+            .do(r => console.log('[GoogleMaps] Fetched:', r.results ? r.results.length : Object.keys(r.result).join('|')))
     }
 
     private _apiUrl(apiPath: string, params: { [key: string]: any }) {
