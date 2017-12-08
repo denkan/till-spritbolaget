@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/toPromise';
 
-import { GoogleMapsService, LatLng, Utils } from '../shared';
+import { GoogleMapsService, GeolocationService, LatLng, Utils } from '../shared';
 import { Location } from 'nativescript-geolocation';
 import { Observable } from 'rxjs/Observable';
 
@@ -27,6 +27,7 @@ export class FindService {
 
     constructor(
         private googleMaps: GoogleMapsService,
+        private geolocation: GeolocationService,
     ) { }
 
     /**
@@ -72,7 +73,7 @@ export class FindService {
                     this._items$$.next(results);
                     resolve(results);
                 })
-            ;
+                ;
 
         });
     }
@@ -88,18 +89,25 @@ export class FindService {
         if (item.details_loading === undefined) {
             this.findAndMergeDetails(item);
         }
+        if (item.directions_loading === undefined) {
+            this.findAndMergeDirections(item);
+        }
 
         this._selectedIndex$$.next(index);
         return true;
     }
 
+    /**
+     * Find details of place and merge into existing item object
+     * @param itemOrIndex 
+     */
     findAndMergeDetails(itemOrIndex: number | any) {
         const item = (typeof itemOrIndex === 'number') ? this._items$$.value[itemOrIndex] : itemOrIndex;
         item.details_loading = true;
 
         return new Promise((resolve, reject) => {
             this.googleMaps.fetch('place/details', { place_id: item.place_id })
-                .map(googleData => googleData.result || {})
+                .map(googleData => googleData.result ||  {})
                 .toPromise()
                 .catch(reject)
                 .then(details => {
@@ -110,7 +118,37 @@ export class FindService {
                     item.details_loading = false;
                     resolve(details);
                 })
-            ;
+                ;
+        });
+    }
+
+    /**
+     * Find directions between location and item/store and merge into existing item object
+     * @param itemOrIndex 
+     */
+    findAndMergeDirections(itemOrIndex: number | any) {
+        const item = (typeof itemOrIndex === 'number') ? this._items$$.value[itemOrIndex] : itemOrIndex;
+        item.directions_loading = true;
+
+        return new Promise((resolve, reject) => {
+            this.geolocation.currentLocation$.first().subscribe(myLocation => {
+
+                const searchParams = {
+                    origin: LatLng.fromObject(myLocation).toString(),
+                    destination: LatLng.fromObject(item.geometry.location).toString(),
+                }
+                this.googleMaps.fetch('directions', searchParams)
+                    .toPromise()
+                    .catch(reject)
+                    .then(directions => {
+                        // merge data
+                        item.directions = directions;
+                        item.directions_loading = false;
+                        resolve(directions);
+                    })
+                    ;
+
+            });
         });
     }
 
