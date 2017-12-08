@@ -28,7 +28,14 @@ export class GoogleMapsService {
     private _apiUrl(apiPath: string, params: { [key: string]: any }) {
         params['key'] = this._apiKey;
         const paramQuery = this._serializeParams(params);
-        return `https://maps.googleapis.com/maps/api/${apiPath}/json?${paramQuery}`;
+
+
+        switch (apiPath.toLowerCase()) {
+            case 'roads/snaptoroads':
+                return `https://roads.googleapis.com/v1/snapToRoads?${paramQuery}`;
+            default:
+                return `https://maps.googleapis.com/maps/api/${apiPath}/json?${paramQuery}`;
+        }
     }
 
     private _serializeParams(params: { [key: string]: any }) {

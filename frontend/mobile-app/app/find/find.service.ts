@@ -37,6 +37,7 @@ export class FindService {
     findNearby(location: LatLng) {
         return new Promise((resolve, reject) => {
 
+            // https://developers.google.com/places/web-service/search
             const searchName = 'Systembolaget'
             const defaultOptions = {
                 keyword: searchName,
@@ -72,9 +73,7 @@ export class FindService {
 
                     this._items$$.next(results);
                     resolve(results);
-                })
-                ;
-
+                });
         });
     }
 
@@ -106,10 +105,16 @@ export class FindService {
         item.details_loading = true;
 
         return new Promise((resolve, reject) => {
+            const doReject = (err?: Error) => {
+                item.details_loading = false;
+                reject(err);
+            }
+
+            // https://developers.google.com/places/web-service/details
             this.googleMaps.fetch('place/details', { place_id: item.place_id })
-                .map(googleData => googleData.result ||  {})
+                .map(googleData => googleData.result || {})
                 .toPromise()
-                .catch(reject)
+                .catch(doReject)
                 .then(details => {
                     // merge data
                     item.opening_hours = details.opening_hours;
@@ -117,8 +122,7 @@ export class FindService {
                     item.formatted_address = details.formatted_address;
                     item.details_loading = false;
                     resolve(details);
-                })
-                ;
+                });
         });
     }
 
@@ -131,24 +135,86 @@ export class FindService {
         item.directions_loading = true;
 
         return new Promise((resolve, reject) => {
+            const doReject = (err?: Error) => {
+                item.directions_loading = false;
+                reject(err);
+            }
+
             this.geolocation.currentLocation$.first().subscribe(myLocation => {
 
+                // https://developers.google.com/maps/documentation/directions/intro
                 const searchParams = {
                     origin: LatLng.fromObject(myLocation).toString(),
                     destination: LatLng.fromObject(item.geometry.location).toString(),
                 }
                 this.googleMaps.fetch('directions', searchParams)
                     .toPromise()
-                    .catch(reject)
+                    .catch(doReject)
                     .then(directions => {
                         // merge data
                         item.directions = directions;
                         item.directions_loading = false;
+                        this.findAndMergeRoadSnaps(item);
                         resolve(directions);
-                    })
-                    ;
-
+                    });
             });
+        });
+    }
+
+    /**
+     * Find road-snaps on directions and merge into existing item object
+     * @param itemOrIndex 
+     */
+    findAndMergeRoadSnaps(itemOrIndex: number | any) {
+        const item = (typeof itemOrIndex === 'number') ? this._items$$.value[itemOrIndex] : itemOrIndex;
+        item.roadsnaps_loading = true;
+
+        return new Promise((resolve, reject) => {
+            const doReject = (err?: Error) => {
+                item.roadsnaps_loading = false;
+                reject(err);
+            }
+
+            // --- collect route points ---
+            const routes: any[] = ((item || {}).directions || {}).routes  ||  []; // item.direction.routes?
+            if (!routes.length || !(routes[0].legs || []).length) return doReject();
+
+            const route = routes[0];
+
+            const points: LatLng[] = [];
+            route.legs.forEach(l => {
+                const steps = <any[]>l.steps;
+                steps.forEach(step => {
+                    const fromPos = LatLng.fromObject(step.start_location);
+                    const toPos = LatLng.fromObject(step.end_location);
+
+                    // avoid unneccessary points
+                    const lastPos = points.length ? points[points.length - 1] : new LatLng(0, 0);
+                    if (fromPos.toString() !== lastPos.toString()) {
+                        points.push(fromPos);
+                    }
+
+                    points.push(toPos);
+                });
+            });
+
+            // --- search snap-to-road points ---
+            // https://developers.google.com/maps/documentation/roads/snap
+            const searchParams = {
+                path: points.map(p => p.toString()).join('|'),
+                interpolate: true
+            }
+            this.googleMaps.fetch('roads/snapToRoads', searchParams)
+                .toPromise()
+                .catch(doReject)
+                .then(data => {
+                    // merge data
+                    item.directions.snappedPoints = data.snappedPoints;
+                    item.directions.snappedPointsPath = points;
+                    item.directions.snappedRoute = route;
+                    item.roadsnaps_loading = false;
+                    resolve(data.snappedPoints);
+                });
         });
     }
 

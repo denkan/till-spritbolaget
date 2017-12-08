@@ -110,10 +110,10 @@ export class MapComponent implements OnInit, OnChanges {
 
     onShapeSelect(e: ShapeEventData) {
         const route = e.shape.userData.route;
-        if(!route) return;
+        if (!route) return;
 
         this.zoomMapToViewport(
-            LatLng.fromObject(route.bounds.southwest), 
+            LatLng.fromObject(route.bounds.southwest),
             LatLng.fromObject(route.bounds.northeast)
         );
     }
@@ -172,17 +172,20 @@ export class MapComponent implements OnInit, OnChanges {
     }
 
     drawDirectionRoutes() {
-        const item = this.items[this.selectedIndex];
+        this.mapView.removeAllShapes();
 
-        if (!item.directions || !this.mapView) {
-            // directions (or map) not yet loaded - try again later (max 10 times)
+        const item = this.items[this.selectedIndex];
+        const getSnappedPoints = (): any[] => (item.directions || {}).snappedPoints;
+
+        if (!getSnappedPoints() || !this.mapView) {
+            // directions/roadsnaps not yet loaded - try again later (max 10 times)
             let tries = 0;
             let triesInterval = setInterval(() => {
                 tries++;
-                if (tries >= 10 || item.directions) {
+                if (tries >= 10 || getSnappedPoints()) {
                     clearInterval(triesInterval);
                 }
-                if (item.directions) {
+                if (getSnappedPoints()) {
                     // loaded - draw again
                     this.drawDirectionRoutes();
                 }
@@ -190,28 +193,10 @@ export class MapComponent implements OnInit, OnChanges {
             return;
         }
 
-        const routes: any[] = item.directions.routes;
-
-        // item.directions.routes.legs === array with items?
-        if (!routes.length || !(routes[0].legs || []).length) return;
-
-        // ready to draw...
-
-        const route = routes[0];
-
-        // clear old drawings
-        this.mapView.removeAllShapes();
-
-        // collect route points
-        const points: Position[] = [];
-        routes[0].legs.forEach(l => {
-            const steps = <any[]>l.steps;
-            steps.forEach(step => {
-                const from = Position.positionFromLatLng(step.start_location.lat, step.start_location.lng)
-                const to = Position.positionFromLatLng(step.end_location.lat, step.end_location.lng);
-                points.push(from);
-                points.push(to);
-            });
+        // collect points
+        const points = getSnappedPoints().map(x => {
+            const l = x.location ||  {};
+            return Position.positionFromLatLng(l.latitude, l.longitude)
         });
 
         // draw route line
@@ -220,11 +205,25 @@ export class MapComponent implements OnInit, OnChanges {
         p.width = 10;
         p.addPoints(points);
         p.clickable = true;
-        p.userData = { 
+        p.userData = {
             index: this.selectedIndex,
             item: item,
-            route: route,
+            route: item.directions.snappedRoute,
         }
+
+        // testing line
+        const points2 = (<LatLng[]>item.directions.snappedPointsPath).map(pos => {
+            return Position.positionFromLatLng(pos.latitude, pos.longitude)
+        });
+
+        const p2 = new Polyline();
+        p2.color = new Color(Utils.COLORS.SUCCESS);
+        p2.width = 10;
+        p2.addPoints(points2);
+        p2.clickable = false;
+
+        // draw
+        this.mapView.addPolyline(p2);
         this.mapView.addPolyline(p);
     }
 
