@@ -1,15 +1,15 @@
-import { 
-    Component, OnInit, ElementRef, ViewChild, Input, Output, 
-    EventEmitter, OnChanges, SimpleChanges 
+import {
+    Component, OnInit, ElementRef, ViewChild, Input, Output,
+    EventEmitter, OnChanges, SimpleChanges
 } from '@angular/core';
 import { registerElement } from 'nativescript-angular/element-registry';
-import { MapView, Marker, Position, Style, Bounds, MarkerEventData } from 'nativescript-google-maps-sdk';
+import { MapView, Marker, Position, Style, Bounds, MarkerEventData, Polyline, ShapeEventData } from 'nativescript-google-maps-sdk';
 import { Image } from 'ui/image';
 import { GridLayout } from 'ui/layouts/grid-layout';
+import { Color } from 'color';
 
 import * as mapStyles from './map.styles';
 import { LatLng, Utils } from '../../shared';
-import {  } from '@angular/core/src/event_emitter';
 
 // Important - must register MapView plugin in order to use in Angular templates
 registerElement('MapView', () => MapView);
@@ -37,6 +37,7 @@ export const enum MARKER_TYPES { ME, STORE };
                 zoomGesturesEnabled="true"
 
                 (markerSelect)="onMarkerSelect($event)"
+                (shapeSelect)="onShapeSelect($event)"
             ></MapView>
         </GridLayout>
     `,
@@ -83,9 +84,11 @@ export class MapComponent implements OnInit, OnChanges {
         if (changes.items) {
             this.changeTasks.push(this.addStoreMarkers);
         }
-        if (changes.selectedIndex !== undefined && this.changeTasks.length === 0) {
-            this.changeTasks.push(this.zoomMap);
+        if (changes.selectedIndex !== undefined) {
+            this.changeTasks.push(this.drawDirectionRoutes);
         }
+
+        this.changeTasks.push(this.zoomMap);
 
         // run immediately if map's loaded - or wait and run in onMapReady()
         if (this.mapView) this.doChangeTasks();
@@ -103,6 +106,16 @@ export class MapComponent implements OnInit, OnChanges {
         if (data.type === MARKER_TYPES.STORE) {
             this.selectItem.emit(data.item);
         }
+    }
+
+    onShapeSelect(e: ShapeEventData) {
+        const route = e.shape.userData.route;
+        if(!route) return;
+
+        this.zoomMapToViewport(
+            LatLng.fromObject(route.bounds.southwest), 
+            LatLng.fromObject(route.bounds.northeast)
+        );
     }
 
     addMyLocationMarker(pos?: LatLng) {
@@ -129,7 +142,6 @@ export class MapComponent implements OnInit, OnChanges {
         marker.color = Utils.COLORS.WARNING;
 
         this.mapView.addMarker(marker);
-        this.zoomMap();
     }
 
     addStoreMarkers(items?: any[]) {
@@ -157,11 +169,64 @@ export class MapComponent implements OnInit, OnChanges {
             marker.color = item.opening_hours.open_now ? Utils.COLORS.SUCCESS : Utils.COLORS.ERROR;
             this.mapView.addMarker(marker);
         });
-
-        this.zoomMap();
     }
 
+    drawDirectionRoutes() {
+        const item = this.items[this.selectedIndex];
 
+        if (!item.directions || !this.mapView) {
+            // directions (or map) not yet loaded - try again later (max 10 times)
+            let tries = 0;
+            let triesInterval = setInterval(() => {
+                tries++;
+                if (tries >= 10 || item.directions) {
+                    clearInterval(triesInterval);
+                }
+                if (item.directions) {
+                    // loaded - draw again
+                    this.drawDirectionRoutes();
+                }
+            }, 100);
+            return;
+        }
+
+        const routes: any[] = item.directions.routes;
+
+        // item.directions.routes.legs === array with items?
+        if (!routes.length || !(routes[0].legs || []).length) return;
+
+        // ready to draw...
+
+        const route = routes[0];
+
+        // clear old drawings
+        this.mapView.removeAllShapes();
+
+        // collect route points
+        const points: Position[] = [];
+        routes[0].legs.forEach(l => {
+            const steps = <any[]>l.steps;
+            steps.forEach(step => {
+                const from = Position.positionFromLatLng(step.start_location.lat, step.start_location.lng)
+                const to = Position.positionFromLatLng(step.end_location.lat, step.end_location.lng);
+                points.push(from);
+                points.push(to);
+            });
+        });
+
+        // draw route line
+        const p = new Polyline();
+        p.color = new Color(Utils.COLORS.WARNING);
+        p.width = 10;
+        p.addPoints(points);
+        p.clickable = true;
+        p.userData = { 
+            index: this.selectedIndex,
+            item: item,
+            route: route,
+        }
+        this.mapView.addPolyline(p);
+    }
 
     zoomMap() {
         if (this.selectedIndex !== undefined) {
