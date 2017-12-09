@@ -20,6 +20,7 @@
 		"@angular/http": "4.4.6",
 		"@angular/platform-browser": "4.4.6",
 		"@angular/router": "4.4.6",
+		"decode-google-map-polyline": "^1.0.1",
 		"nativescript-angular": "4.4.1",
 		"nativescript-geolocation": "^4.2.0",
 		"nativescript-google-maps-sdk": "^2.4.3",

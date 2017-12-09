@@ -11,6 +11,8 @@ import { Color } from 'color';
 import * as mapStyles from './map.styles';
 import { LatLng, Utils } from '../../shared';
 
+const decodePolyline = require('decode-google-map-polyline');
+
 // Important - must register MapView plugin in order to use in Angular templates
 registerElement('MapView', () => MapView);
 
@@ -203,16 +205,8 @@ export class MapComponent implements OnInit, OnChanges {
         this.mapView.removeAllShapes();
 
         // collect route points
-        const points: Position[] = [];
-        routes[0].legs.forEach(l => {
-            const steps = <any[]>l.steps;
-            steps.forEach(step => {
-                const from = Position.positionFromLatLng(step.start_location.lat, step.start_location.lng)
-                const to = Position.positionFromLatLng(step.end_location.lat, step.end_location.lng);
-                points.push(from);
-                points.push(to);
-            });
-        });
+        const decodedPoints = decodePolyline(route.overview_polyline.points);
+        const points: Position[] = decodedPoints.map(x => Position.positionFromLatLng(x.lat, x.lng))
 
         // draw route line
         const p = new Polyline();
