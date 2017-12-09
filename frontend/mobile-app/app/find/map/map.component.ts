@@ -12,6 +12,7 @@ import * as mapStyles from './map.styles';
 import { LatLng, Utils } from '../../shared';
 
 const decodePolyline = require('decode-google-map-polyline');
+const Rainbow = require('rainbowvis.js');
 
 // Important - must register MapView plugin in order to use in Angular templates
 registerElement('MapView', () => MapView);
@@ -112,10 +113,10 @@ export class MapComponent implements OnInit, OnChanges {
 
     onShapeSelect(e: ShapeEventData) {
         const route = e.shape.userData.route;
-        if(!route) return;
+        if (!route) return;
 
         this.zoomMapToViewport(
-            LatLng.fromObject(route.bounds.southwest), 
+            LatLng.fromObject(route.bounds.southwest),
             LatLng.fromObject(route.bounds.northeast)
         );
     }
@@ -206,20 +207,39 @@ export class MapComponent implements OnInit, OnChanges {
 
         // collect route points
         const decodedPoints = decodePolyline(route.overview_polyline.points);
-        const points: Position[] = decodedPoints.map(x => Position.positionFromLatLng(x.lat, x.lng))
+        const points: Position[] = decodedPoints.map(x => Position.positionFromLatLng(x.lat, x.lng));
 
-        // draw route line
-        const p = new Polyline();
-        p.color = new Color(Utils.COLORS.WARNING);
-        p.width = 10;
-        p.addPoints(points);
-        p.clickable = true;
-        p.userData = { 
-            index: this.selectedIndex,
-            item: item,
-            route: route,
-        }
-        this.mapView.addPolyline(p);
+        if (!points.length) return;
+
+        // make gradients
+        const gradients = new Rainbow();
+        gradients.setSpectrum(
+            Utils.COLORS.WARNING,
+            item.opening_hours.open_now ? Utils.COLORS.SUCCESS : Utils.COLORS.ERROR
+        );
+        gradients.setNumberRange(0, points.length);
+
+        // draw each point as line
+        let lastPos = null;
+        points.forEach((pos, i) => {
+
+            if (lastPos) {
+                const p = new Polyline();
+                p.color = new Color('#' + gradients.colourAt(i));
+                p.width = 10;
+                p.addPoints([lastPos, pos]);
+                p.clickable = true;
+                p.userData = {
+                    index: this.selectedIndex,
+                    item: item,
+                    route: route,
+                }
+                this.mapView.addPolyline(p);
+            }
+
+            lastPos = pos;
+        })
+
     }
 
     zoomMap() {
