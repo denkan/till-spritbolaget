@@ -3,37 +3,38 @@ import { EventData } from 'tns-core-modules/ui/frame/frame';
 import { android as isAndroid, ios as isIOS } from 'application';
 import { AndroidData, IOSData, ShapeEnum } from "nativescript-ng-shadow";
 
+import { UIService } from '../../shared';
+
 @Component({
     selector: 'TheAlertButton',
     template: `
         <GridLayout *ngIf="!searched" colums="*,auto,*" rows="*,auto,*">
-            <Button 
-                class="btn btn-primary alert-button" 
+            <Image src="res://alert_button" 
+                *ngIf="pageWidth"
+                [width]="pageWidth"
+                [height]="pageWidth"
                 col="1" row="1" 
                 (tap)="onTap($event)"
-                [shadow]="shadow"
-            ></Button>
+            ></Image>
         </GridLayout>
     `,
-    styles: [`
-        .alert-button {
-            width: 300;
-            height: 300;
-            border-radius: 150;
-        }
-    `]
 })
 export class AlertButtonComponent implements OnInit {
     @Output() tap = new EventEmitter<EventData>();
 
     shadow: AndroidData | IOSData;
+    pageWidth: number;
 
-    constructor() { }
+    constructor(
+        private ui: UIService,
+    ) { }
 
     ngOnInit() {
         this.shadow = isAndroid
             ? { elevation: 12, bgcolor: '#D84039', shape: ShapeEnum.OVAL }
             : { elevation: 12 };
+
+        this.ui.pageSize$.filter(s => !!s).subscribe(s => this.pageWidth=s.width);
     }
 
     onTap(e: EventData) {
