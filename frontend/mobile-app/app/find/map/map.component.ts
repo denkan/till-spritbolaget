@@ -121,6 +121,7 @@ export class MapComponent implements OnInit, OnChanges {
         );
     }
 
+    private _myLocationAnimation: number;
     addMyLocationMarker(pos?: LatLng) {
         pos = pos || this.myLocation;
 
@@ -135,16 +136,25 @@ export class MapComponent implements OnInit, OnChanges {
         // marker.snippet = "Du";
         marker.userData = { type: MARKER_TYPES.ME };
 
-        const img = new Image();
-        img.src = 'res://icon';
-        img.width = 20;
-        img.height = 20;
-        //img.stretch = 'none';
-        //marker.icon = img;
-        marker.flat = true;
-        marker.color = Utils.COLORS.WARNING;
+        const icons = [
+            'icon_my_location_0',
+            'icon_my_location_1',
+            'icon_my_location_2',
+            'icon_my_location_3',
+        ];
+        marker.icon = icons[0];
+        marker.anchor = [0.5, 0.76];
 
+        // marker.flat = true;
+        // marker.color = Utils.COLORS.WARNING;
         this.mapView.addMarker(marker);
+
+        // animate marker
+        clearInterval(this._myLocationAnimation);
+        let count = 0;
+        this._myLocationAnimation = setInterval(() => {
+            marker.icon = icons[count++ % icons.length];
+        }, 200);
     }
 
     addStoreMarkers(items?: any[]) {
